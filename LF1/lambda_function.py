@@ -4,6 +4,7 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 import datetime
 import requests
+import os
 
 
 def lambda_handler(event, context):
@@ -40,12 +41,12 @@ def lambda_handler(event, context):
     photo_json["bucket"] = bucket
     photo_json["createdTimestamp"] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     photo_json["labels"] = photo_labels
-    photo_json = json.dumps(data)
+    photo_json = json.dumps(photo_json)
 
-    print(photo_json))
+    print(photo_json)
 
     # TODO
-    index_elasticsearch(photo_labels)
+    index_elasticsearch(photo_json)
     
     return {
         'statusCode': 200,
@@ -105,27 +106,33 @@ def fetch_user_labels(bucket,photo):
     # }
     
     user_labels = []
-    try: 
-        s3 = boto3.client('s3')
-        metadata = s3.head_object(
-            Bucket=bucket,
-            Key=photo,
-        )
-        if metadata["ResponseMetadata"]["x-amz-meta-customLabels"]:
-            for label in metadata["ResponseMetadata"]["x-amz-meta-customLabels"]:
-                user_labels.append(label)
-            for label in user_labels:
-                photo_labels.append(label)
-    except Exception as e:
-        print("Error in extracting user label, error is: ")
-        print(str(e))
+    s3 = boto3.client('s3')
+    metadata = s3.head_object(Bucket=bucket, Key=photo)
+    print("Metadata is: ", metadata["ResponseMetadata"]["HTTPHeaders"])
+    print("Metadata is: ", metadata["Metadata"])
+    # try: 
+    if metadata["ResponseMetadata"]["HTTPHeaders"]["x-amz-meta-customlabels"]:
+        custom_labels = metadata["ResponseMetadata"]["HTTPHeaders"]["x-amz-meta-customlabels"].split()
+        # print("FOUND SOME CUSTOM LABELS:")
+        # print(metadata["ResponseMetadata"]["HTTPHeaders"]["x-amz-meta-customlabels"])
+        for label in custom_labels:
+            user_labels.append(label)
+    else:
+        print("DIDN'T FIND ANY CUSTOM TAGS")
+    # except Exception as e:
+    #     print("Error in extracting user label, error is: ")
+    #     print(str(e))
     return user_labels
 
-def index_elasticsearch(photo_labels):
+def index_elasticsearch(photo_json):
     
     # Set up ES labels
 
     host = 'search-photos-cvl5kpkrddtvprdzlgtoxrpa7a.us-east-1.es.amazonaws.com' # For example, my-test-domain.us-east-1.es.amazonaws.com
+    try:
+        host = os.environ['ESPhotosEndpoint']
+    except:
+        pass
     region = 'us-east-1' 
 
     print("Setting up credentials..")
@@ -141,13 +148,33 @@ def index_elasticsearch(photo_labels):
         verify_certs = True,
         connection_class = RequestsHttpConnection
     )
-    print("Successfully initiated ES Auth")
-    document = {
-        "title": "Moneyball",
-        "director": "Bennett Miller",
-        "year": "2011"
-    }
-    print("Attempting to index document within ES")
-    es.index(index="movies", doc_type="_doc", id="5", body=document)
-    print("Successfully indexed, now trying to fetch and print below: ")
-    print(es.get(index="movies", doc_type="_doc", id="5"))
+    print("Successfully initiated ES Auth, trying to index...")
+
+    # Let ES autogenerate ID
+    es.index(index="photographs", body=photo_json)
+    try:
+        es.index(index="photographs", doc_type="_doc",body=photo_json)
+        print("Successfully indexed!")
+    except:
+        print("Error, could not index")
+
+    # document = '{ "index" : { "_index" : "objectKey", "_type" : "_doc" } }\n'
+    # document += json.loads(photo_json)
+    # document = json.dumps(document)
+
+    # document = {
+    #     "title": "Moneyball",
+    #     "director": "Bennett Miller",
+    #     "year": "2011"
+    # }
+
+    # document = {
+    #     "objectKey": "my-photo.jpg",
+    #     "bucket": "my-photo-bucket",
+    #     "createdTimestamp": "2018-11-05T12:40:02",
+    #     "labels": photo_labels
+    # }
+    # print("Attempting to index document within ES")
+    # es.index(index="movies", doc_type="_doc", id="5", body=document)
+    # print("Successfully indexed, now trying to fetch and print below: ")
+    # print(es.get(index="movies", doc_type="_doc", id="5"))
