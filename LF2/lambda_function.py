@@ -89,7 +89,6 @@ def lambda_handler(event, context):
     print(json.dumps({"message":"Found some photos!",
                             "Links": list(photo_links)}))
                             
-
     return {
         'statusCode': 200,
         'headers': {
