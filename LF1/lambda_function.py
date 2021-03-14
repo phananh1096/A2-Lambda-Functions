@@ -152,11 +152,36 @@ def index_elasticsearch(photo_json):
 
     # Let ES autogenerate ID
     # es.index(index="photographs", body=photo_json)
+    # try:
+    #     es.index(index="photographs", doc_type="_doc",body=photo_json)
+    #     print("Successfully indexed!")
+    # except:
+    #     print("Error, could not index")
+
+
+    # Requests method for indexing ES:
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    # Add newling to address ES complain:
+    # photo_json += "\\n"
+    AUTH_USER = "phananh1096"
     try:
-        es.index(index="photographs", doc_type="_doc",body=photo_json)
-        print("Successfully indexed!")
+        AUTH_USER = os.environ['AUTH_USER']
     except:
-        print("Error, could not index")
+        pass
+    AUTH_PASS = "Columbia311096!"
+    try:
+        AUTH_USER = os.environ['AUTH_PASS']
+    except:
+        pass
+    bulk_file = ''
+    bulk_file += '{ "index" : { "_index" : "site", "_type" : "_doc"} }\n'
+    bulk_file += photo_json + '\n'
+    es_url = "https://" + host + "/_bulk"
+    # es_url = "https://" + host + "/photographs"
+    index_request = requests.put(es_url, headers=headers, data=bulk_file, auth=(AUTH_USER, AUTH_PASS)).text
+    print("Requests method response for testing ES: ", index_request)
 
     # document = '{ "index" : { "_index" : "objectKey", "_type" : "_doc" } }\n'
     # document += json.loads(photo_json)

@@ -23,17 +23,31 @@ def lambda_handler(event, context):
     client = boto3.client('lex-runtime')
     response = client.post_text(
         botName='LexPhotoQuery',
+        # botName='OrderFlowers',
         botAlias='SearchPhotos',
         userId='pa_test',
         inputText=query
     )
     print("Lex Response is: ", response)
-    for key_term in response["slots"]:
-        val = response["slots"][key_term]
-        if val:
-            parsed_query += f"+{val}"
-    parsed_query = parsed_query[1:]
-    print("Extracted Lex query is: ", parsed_query)
+    key = "slots"
+    if key in response:
+        for key_term in response["slots"]:
+            val = response["slots"][key_term]
+            if val:
+                parsed_query += f"+{val}"
+        parsed_query = parsed_query[1:]
+        print("Extracted Lex query is: ", parsed_query)
+    else:
+        return {
+                'statusCode': 502,
+                'headers': {
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+                },
+                'body': json.dumps({"message":"Sorry, Lex bot did not recognize this slot.."}),
+            }
+
 
     # # Pass parsed query into Search elasticsearch:
     # es_url = "https://search-photos-cvl5kpkrddtvprdzlgtoxrpa7a.us-east-1.es.amazonaws.com/_search?q="
@@ -69,8 +83,23 @@ def lambda_handler(event, context):
         connection_class = RequestsHttpConnection
     )
     print("Got some results back from es...")
-    search_results = es.search(q=parsed_query)
-    print(search_results)
+    # search_results = es.search(q=parsed_query)
+    # print(search_results)
+
+    # # Requests method for searching ES:
+    AUTH_USER = "phananh1096"
+    try:
+        AUTH_USER = os.environ['AUTH_USER']
+    except:
+        pass
+    AUTH_PASS = "Columbia311096!"
+    try:
+        AUTH_USER = os.environ['AUTH_PASS']
+    except:
+        pass
+    es_url = "https://" + host + "/_search?q="
+    search_results = json.loads(requests.get(es_url+parsed_query, auth=(AUTH_USER, AUTH_PASS)).text)
+    print("Requests method response for testing ES: ", search_results)
 
     search_results = search_results['hits']['hits']
     # photo_links = ["https://coms6998-sp21-photobucket.s3.amazonaws.com/img001.jpg"]
