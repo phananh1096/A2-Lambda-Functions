@@ -22,7 +22,7 @@ def lambda_handler(event, context):
     # Lex disambiguation source: https://stackoverflow.com/questions/52358345/aws-lex-select-query-from-user-question
     client = boto3.client('lex-runtime')
     response = client.post_text(
-        botName='OrderFlowers',
+        botName='LexPhotoQuery',
         botAlias='SearchPhotos',
         userId='pa_test',
         inputText=query
