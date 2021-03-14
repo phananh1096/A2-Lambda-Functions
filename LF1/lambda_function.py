@@ -151,7 +151,7 @@ def index_elasticsearch(photo_json):
     print("Successfully initiated ES Auth, trying to index...")
 
     # Let ES autogenerate ID
-    es.index(index="photographs", body=photo_json)
+    # es.index(index="photographs", body=photo_json)
     try:
         es.index(index="photographs", doc_type="_doc",body=photo_json)
         print("Successfully indexed!")
