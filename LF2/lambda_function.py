@@ -87,16 +87,19 @@ def lambda_handler(event, context):
     # print(search_results)
 
     # # Requests method for searching ES:
-    AUTH_USER = "phananh1096"
+    # AUTH_USER = "phananh1096"
+    AUTH_USER = ""
     try:
         AUTH_USER = os.environ['AUTH_USER']
     except:
         pass
-    AUTH_PASS = "Columbia311096!"
+    # AUTH_PASS = "Columbia311096!"
+    AUTH_PASS = ""
     try:
         AUTH_USER = os.environ['AUTH_PASS']
     except:
         pass
+    print("AUTH_USER: {}, AUTH_PASS: {}".format(AUTH_USER, AUTH_PASS))
     es_url = "https://" + host + "/_search?q="
     search_results = json.loads(requests.get(es_url+parsed_query, auth=(AUTH_USER, AUTH_PASS)).text)
     print("Requests method response for testing ES: ", search_results)

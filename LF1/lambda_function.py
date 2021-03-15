@@ -165,16 +165,19 @@ def index_elasticsearch(photo_json):
     }
     # Add newling to address ES complain:
     # photo_json += "\\n"
-    AUTH_USER = "phananh1096"
+    # AUTH_USER = "phananh1096"
+    AUTH_USER = ""
     try:
         AUTH_USER = os.environ['AUTH_USER']
     except:
         pass
-    AUTH_PASS = "Columbia311096!"
+    # AUTH_PASS = "Columbia311096!"
+    AUTH_PASS = ""
     try:
         AUTH_USER = os.environ['AUTH_PASS']
     except:
         pass
+    print("AUTH_USER: {}, AUTH_PASS: {}".format(AUTH_USER, AUTH_PASS))
     bulk_file = ''
     bulk_file += '{ "index" : { "_index" : "site", "_type" : "_doc"} }\n'
     bulk_file += photo_json + '\n'
