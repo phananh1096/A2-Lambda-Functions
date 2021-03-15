@@ -174,7 +174,7 @@ def index_elasticsearch(photo_json):
     # AUTH_PASS = "Columbia311096!"
     AUTH_PASS = ""
     try:
-        AUTH_USER = os.environ['AUTH_PASS']
+        AUTH_PASS = os.environ['AUTH_PASS']
     except:
         pass
     print("AUTH_USER: {}, AUTH_PASS: {}".format(AUTH_USER, AUTH_PASS))
