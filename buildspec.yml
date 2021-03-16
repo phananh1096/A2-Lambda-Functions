@@ -4,7 +4,7 @@ phases:
     commands:
       - aws cloudformation package --template-file samTemplate.yaml --s3-bucket coms6998-sp21-a2 --output-template-file outputsamtemplate.yml
 artifacts:
-  type: zip
+#   type: zip
   files:
     - samTemplate.yaml
     - outputsamtemplate.yml
