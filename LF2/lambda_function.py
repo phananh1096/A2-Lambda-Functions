@@ -1,3 +1,4 @@
+import os
 import json
 import boto3
 from elasticsearch import Elasticsearch, RequestsHttpConnection
