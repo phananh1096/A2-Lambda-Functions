@@ -2,9 +2,9 @@ version: 0.1
 phases:
   install:
     commands:
-      - aws cloudformation package --template-file samTemplate.yaml --s3-bucket lambda-bucket-assignment2 --output-template-file outputsamtemplate.yml
+      - aws cloudformation package --template-file assignment2stack.yaml --s3-bucket lambda-bucket-assignment2 --output-template-file outputAssignment2Stack.yml
 artifacts:
 #   type: zip
   files:
-    - samTemplate.yaml
-    - outputsamtemplate.yml
+    - assignment2stack.yaml
+    - outputAssignment2Stack.yml
