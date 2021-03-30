@@ -131,13 +131,3 @@ def lambda_handler(event, context):
         'body': json.dumps({"message":"Found some photos!",
                             "Links": list(photo_links)}),
     }
-
-# def get_photo_link(photo):
-#     s3 = boto3.client('s3')
-#     metadata = s3.get_object(
-#         Bucket=photo["bucket"],
-#         Key=photo["objectKey"],
-#     )
-#     #Then return link
-#     link = ""
-#     return link
