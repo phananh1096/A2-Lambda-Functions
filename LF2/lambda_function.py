@@ -16,8 +16,6 @@ def lambda_handler(event, context):
     logger.debug(event)
     query = event["queryStringParameters"]['q']
     parsed_query = ""
-    #test
-    # query = "I want to see photos of dogs"
 
     # Lex disambiguation source: https://stackoverflow.com/questions/52358345/aws-lex-select-query-from-user-question
     client = boto3.client('lex-runtime')
