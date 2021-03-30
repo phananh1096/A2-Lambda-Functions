@@ -11,7 +11,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 def lambda_handler(event, context):
-    #TODO: IMPLEMENT
     print("Going to process query:")
     print("API Event is: ", event)
     logger.debug(event)
