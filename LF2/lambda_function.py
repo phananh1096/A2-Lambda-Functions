@@ -81,8 +81,6 @@ def lambda_handler(event, context):
         connection_class = RequestsHttpConnection
     )
     print("Got some results back from es...")
-    # search_results = es.search(q=parsed_query)
-    # print(search_results)
 
     # # Requests method for searching ES:
     # AUTH_USER = "phananh1096"
