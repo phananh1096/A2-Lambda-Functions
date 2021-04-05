@@ -10,6 +10,7 @@ import os
 def lambda_handler(event, context):
     
     photo_labels = []
+    print("I am Shantanu.")
     
     # Generate image labels using rekognition and fetch custom labels
     for i in range(len(event["Records"])):
